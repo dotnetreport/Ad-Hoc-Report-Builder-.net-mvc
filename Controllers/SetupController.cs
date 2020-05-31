@@ -290,7 +290,7 @@ namespace ReportBuilder.Web.Controllers
             return tables;
         }
 
-        private async Task<List<TableViewModel>> GetProcedure(string type = "PROCEDURE", string accountKey = null, string dataConnectKey = null)
+        public async Task<List<TableViewModel>> GetProcedure(string type = "PROCEDURE", string accountKey = null, string dataConnectKey = null)
         {
             var tables = new List<TableViewModel>();
 
@@ -363,6 +363,39 @@ namespace ReportBuilder.Web.Controllers
 
 
             return tables;
+        }
+
+
+        public async Task<List<SelectListItem>> GetProcedureName(string accountKey = null, string dataConnectKey = null)
+        {
+            List<SelectListItem> selectListItems = new List<SelectListItem>();
+            var connString = await GetConnectionString(GetConnection(dataConnectKey));
+            using (OleDbConnection conn = new OleDbConnection(connString))
+            {
+                // open the connection to the database 
+                conn.Open();
+                string Query = @"Select * from StoreProcedures";
+                OleDbCommand cmd = new OleDbCommand(Query, conn);
+                cmd.CommandType = CommandType.Text;
+                DataTable dtProcedures = new DataTable();
+                dtProcedures.Load(cmd.ExecuteReader());
+               
+                foreach (DataRow dr in dtProcedures.Rows)
+                {
+                    SelectListItem item = new SelectListItem();
+                    item.Value = dr["ID"].ToString();
+                    item.Text = dr["StoreProcedureName"].ToString();
+
+                    selectListItems.Add(item);
+                }
+                // cmd.ExecuteReader();
+
+                conn.Close();
+                conn.Dispose();
+            }
+
+
+            return selectListItems;
         }
 
         private async Task<List<TableViewModel>> GetApiProcedure(string accountKey, string dataConnectKey)

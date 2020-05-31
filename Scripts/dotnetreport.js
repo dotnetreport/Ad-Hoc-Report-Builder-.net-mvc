@@ -10,7 +10,7 @@ function pagerViewModel(args) {
 	self.currentPage = ko.observable(args.currentPage || 1);
 	self.pauseNavigation = ko.observable(false);
 	self.totalRecords = ko.observable(0);
-
+	
 	self.sortColumn = ko.observable();
 	self.sortDescending = ko.observable();
 
@@ -292,6 +292,7 @@ var reportViewModel = function (options) {
 	self.ReportDescription = ko.observable();
 	self.FolderID = ko.observable();
 	self.ReportID = ko.observable();
+	self.Procedures = ko.observableArray([]);
 
 	self.Tables = ko.observableArray([]);
 	self.SelectedTable = ko.observable();
@@ -1629,7 +1630,15 @@ var reportViewModel = function (options) {
 			self.Tables(tables);
 		});
 	};
-
+	self.loadProcedures = function () {
+		// Load tables
+		ajaxcall({
+			url: "/Report/CallProcedure",
+			type: "GET"
+		}).done(function (result) {
+			self.Procedures(result);
+		});
+	};
 	self.init = function (folderId, noAccount) {
 		if (noAccount) {
 			$("#noaccountModal").modal('show');
@@ -1638,7 +1647,7 @@ var reportViewModel = function (options) {
 
 		self.loadFolders(folderId);
 		self.loadTables();
-
+		self.loadProcedures();
 		var adminMode = false;
 		if (localStorage) adminMode = localStorage.getItem('reportAdminMode');
 

@@ -249,10 +249,13 @@
                 <hr />
                 <h5><span class="fa fa-database"></span> Choose Data for Report</h5>
                 <div>
-                    <div class="col-md-12">
+                    <div class="col-md-12" data-bind="if: ReportType()!='Custom'">
                         <select class="form-control" data-bind="options: Tables, optionsCaption: 'Choose Section...', optionsText: 'tableName', value: SelectedTable, disable: isFormulaField"></select>
                     </div>
-
+                    <div class="col-md-12" data-bind="if: ReportType()=='Custom'">
+                      
+                        <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'Text', value: SelectedTable"></select>
+                    </div>
                     <div class="col-md-12 padded-div" data-bind="visible: ChooseFields().length>0">
                         <div class="small pull-left">
                             Check the fields you would like to use in the Report
