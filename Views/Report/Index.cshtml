@@ -254,7 +254,15 @@
                     </div>
                     <div class="col-md-12" data-bind="if: ReportType()=='Custom'">
                       
-                        <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'Text', value: SelectedTable"></select>
+                        <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'TableName', value: SelectedTable,event:{ change: procedureChanged}"></select>
+                    </div>
+                    <div class="row" data-bind="with: ProcedureParamters">
+                        <div data-bind="foreach: Parameters">
+                            <div class="col-md-3">
+                                <label> <span data-bind="text: ParameterName"> </span></label>
+                                <input type="text" class="form-control" data-bind="textInput: $data.ParameterValue, attr: {id: $index()}" />
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-12 padded-div" data-bind="visible: ChooseFields().length>0">
                         <div class="small pull-left">

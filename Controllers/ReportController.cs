@@ -117,7 +117,7 @@ namespace ReportBuilder.Web.Controllers
 
         public async Task<ActionResult> CallProcedure()
         {
-            var procedures = await new ReportBuilder.Web.Controllers.SetupController().GetProcedureName();
+            var procedures = await new ReportBuilder.Web.Controllers.SetupController().GetProcedure();
             return Json(procedures, JsonRequestBehavior.AllowGet);
         }
             public async Task<JsonResult> CallReportApi(string method, string model)
@@ -152,7 +152,7 @@ namespace ReportBuilder.Web.Controllers
                     var sqlqeuery = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(stringContent);
                     object value;
                     var KeyValuePair = sqlqeuery.TryGetValue("sql", out value);
-                    var sql = DotNetReportHelper.DecryptTest(value.ToString());
+                  //  var sql = DotNetReportHelper.DecryptTest(value.ToString());
                 }
                 Response.StatusCode = (int)response.StatusCode;
                 return Json((new JavaScriptSerializer()).Deserialize<dynamic>(stringContent), JsonRequestBehavior.AllowGet);

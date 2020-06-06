@@ -293,7 +293,7 @@ var reportViewModel = function (options) {
 	self.FolderID = ko.observable();
 	self.ReportID = ko.observable();
 	self.Procedures = ko.observableArray([]);
-
+	self.ProcedureParamters = ko.observable();
 	self.Tables = ko.observableArray([]);
 	self.SelectedTable = ko.observable();
 
@@ -402,7 +402,13 @@ var reportViewModel = function (options) {
 			}
 		});
 	};
-
+	self.procedureChanged = function (e) {
+		const filterText = self.SelectedTable().TableName;
+		let result = _.filter(self.Procedures(), function (e) {
+			return e.TableName.toLowerCase().indexOf(filterText.toLowerCase()) >= 0;
+		});
+		self.ProcedureParamters(result[0]);
+    }
 	self.FlyFilters = ko.computed(function () {
 		var flyfilters = [];
 		_.forEach(self.FilterGroups(), function (e) {

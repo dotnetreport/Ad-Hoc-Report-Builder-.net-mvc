@@ -265,6 +265,7 @@ namespace ReportBuilder.Web.Models
         public bool CanUseAdminMode { get; set; }
     }
 
+
     public class DotNetReportHelper
     {
         public static byte[] GetExcelFile(string reportSql, string connectKey, string reportName)
@@ -458,35 +459,44 @@ namespace ReportBuilder.Web.Models
                 }
             }
         }
-        public static string DecryptTest(string encryptedText)
+
+         public enum dataType
+        {
+            System_Boolean = 0,
+            System_Int32 = 1,
+            System_Int64 = 2,
+            System_Double = 3,
+            System_DateTime = 4,
+            System_String = 5
+        }
+
+        public static dataType ParseString(string str)
         {
 
-            byte[] initVectorBytes = Encoding.ASCII.GetBytes("yk0z8f39lgpu70gi"); // PLESE DO NOT CHANGE THIS KEY
-            int keysize = 256;
+            bool boolValue;
+            Int32 intValue;
+            Int64 bigintValue;
+            double doubleValue;
+            DateTime dateValue;
 
-            byte[] cipherTextBytes = Convert.FromBase64String(encryptedText);
-            var passPhrase = ConfigurationManager.AppSettings["dotNetReport.privateApiToken"].ToLower();
-            using (PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null))
-            {
-                byte[] keyBytes = password.GetBytes(keysize / 8);
-                using (RijndaelManaged symmetricKey = new RijndaelManaged())
-                {
-                    symmetricKey.Mode = CipherMode.CBC;
-                    using (ICryptoTransform decryptor = symmetricKey.CreateDecryptor(keyBytes, initVectorBytes))
-                    {
-                        using (MemoryStream memoryStream = new MemoryStream(cipherTextBytes))
-                        {
-                            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
-                            {
-                                byte[] plainTextBytes = new byte[cipherTextBytes.Length];
-                                int decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
-                                return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
-                            }
-                        }
-                    }
-                }
-            }
+            // Place checks higher in if-else statement to give higher priority to type.
+
+            if (bool.TryParse(str, out boolValue))
+                return dataType.System_Boolean;
+            else if (Int32.TryParse(str, out intValue))
+                return dataType.System_Int32;
+            else if (Int64.TryParse(str, out bigintValue))
+                return dataType.System_Int64;
+            else if (double.TryParse(str, out doubleValue))
+                return dataType.System_Double;
+            else if (DateTime.TryParse(str, out dateValue))
+                return dataType.System_DateTime;
+            else return dataType.System_String;
+
         }
+
+
+       
 
     }
 }
