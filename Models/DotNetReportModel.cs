@@ -495,8 +495,5 @@ namespace ReportBuilder.Web.Models
 
         }
 
-
-       
-
     }
 }
