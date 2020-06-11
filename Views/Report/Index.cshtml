@@ -253,14 +253,14 @@
                         <select class="form-control" data-bind="options: Tables, optionsCaption: 'Choose Section...', optionsText: 'tableName', value: SelectedTable, disable: isFormulaField"></select>
                     </div>
                     <div class="col-md-12" data-bind="if: ReportType()=='Custom'">
-                      
-                        <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'TableName', value: SelectedTable,event:{ change: procedureChanged}"></select>
+
+                        <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'TableName', optionsValue: 'Id', value: SelectedProcedure,event:{ change: procedureChanged}"></select>
                     </div>
                     <div class="row" data-bind="with: ProcedureParamters">
                         <div data-bind="foreach: Parameters">
                             <div class="col-md-3">
                                 <label> <span data-bind="text: ParameterName"> </span></label>
-                                <input type="text" class="form-control" data-bind="textInput: $data.ParameterValue, attr: {id: $index()}" />
+                                <input type="text" class="form-control" data-bind="value: $data.ParameterValue, attr: {id: $index()}" />
                             </div>
                         </div>
                     </div>
@@ -385,7 +385,7 @@
                             <span data-bind="visible: !$root.isFieldValidForYAxis($index(), fieldType)">
                                 <span class="label label-danger" data-bind="visible: !groupInGraph()">Will not show in <span data-bind="text: $root.ReportType"></span> Chart</span>
                             </span>
-                            
+
                             <div class="input-group pull-right" style="margin-top: -5px;">
                                 <select class="form-control input-sm" style="width: 120px;" data-bind="options: $root.canDrilldown() && $index()>0 ? fieldAggregateWithDrilldown : fieldAggregate, value: selectedAggregate, visible: $parent.AggregateReport"></select>
                             </div>
@@ -445,7 +445,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Sort By</label>
                         <div class="col-sm-10">
-                            <select class="form-control" required data-bind="options: enabledFields, optionsText: 'selectedFieldName', optionsValue: 'fieldId', value: SortByField"></select>
+                            <select class="form-control" required data-bind="options: enabledFields, optionsText: 'selectedFieldName', optionsValue: 'fieldId', value: SortByField, attr : { name: 'SortBy'}"></select>
                         </div>
                     </div>
                     <div class="checkbox">
