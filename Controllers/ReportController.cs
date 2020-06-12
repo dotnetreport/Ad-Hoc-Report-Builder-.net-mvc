@@ -115,6 +115,7 @@ namespace ReportBuilder.Web.Controllers
             return await CallReportApi(data.Method, (new JavaScriptSerializer()).Serialize(data));
         }
 
+
         public async Task<ActionResult> CallProcedure()
         {
             var procedures = await new ReportBuilder.Web.Controllers.SetupController().GetProcedure();
