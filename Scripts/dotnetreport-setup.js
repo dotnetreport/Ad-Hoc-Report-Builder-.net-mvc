@@ -25,7 +25,7 @@
 				}
 			});
 		}
-	}
+	};
 
 	self.JoinFilters = {
 		primaryTable: ko.observable(),
@@ -33,7 +33,7 @@
 		joinType: ko.observable(),
 		joinTable: ko.observable(),
 		joinField: ko.observable()
-	}
+	};
 
 	self.filteredJoins = ko.computed(function () {
 		var primaryTableFilter = self.JoinFilters.primaryTable();
@@ -59,17 +59,17 @@
 
 	self.selectColumn = function (e) {
 		self.editColumn(e);
-	}
+	};
 
 	self.editAllowedRoles = ko.observable();
 	self.newAllowedRole = ko.observable();
 	self.selectAllowedRoles = function (e) {
 		self.editAllowedRoles(e);
-	}
+	};
 
 	self.removeAllowedRole = function (e) {
 		self.editAllowedRoles().AllowedRoles.remove(e);
-	}
+	};
 
 	self.addAllowedRole = function () {
 		if (!self.newAllowedRole() || _.filter(self.editAllowedRoles().AllowedRoles(), function (x) { return x == self.newAllowedRole(); }).length > 0) {
@@ -78,14 +78,14 @@
 		}
 		self.editAllowedRoles().AllowedRoles.push(self.newAllowedRole());
 		self.newAllowedRole(null);
-	}
+	};
 
 	self.newDataConnection = {
 		Name: ko.observable(),
 		ConnectionKey: ko.observable(),
 		copySchema: ko.observable(false),
 		copyFrom: ko.observable()
-	}
+	};
 
 	self.addDataConnection = function () {
 		$(".form-group").removeClass("has-error");
@@ -123,7 +123,7 @@
 		});
 
 		return true;
-	}
+	};
 
 	self.setupJoin = function (item) {
 		item.JoinTable = ko.observable();
@@ -146,14 +146,14 @@
 			item.FieldName(item.originalField());
 			item.JoinFieldName(item.originalJoinField());
 			//}); // Make sure fields are loaded
-		})
+		});
 
 		item.JoinTable.subscribe(function (subitem) {
 			//subitem.loadFields().done(function () {
 			item.FieldName(item.originalField());
 			item.JoinFieldName(item.originalJoinField());
 			//}); // Make sure fields are loaded
-		})
+		});
 
 		item.DeleteJoin = function () {
 			bootbox.confirm("Are you sure you would like to delete this Join?", function (r) {
@@ -182,9 +182,10 @@
 			self.DataConnections(result);
 			self.currentConnectionKey(self.keys.DatabaseApiKey);
 		});
-	}
+	};
+
 	self.serachStoreProcedure = function () {
-		
+
 		ajaxcall({
 			url: "/Setup/SearchProcedure",
 			type: 'POST',
@@ -194,30 +195,28 @@
 				dataConnectKey: self.keys.DatabaseApiKey
 			})
 		}).done(function (result) {
-			debugger;
-			self.filteredProceduresBySearch(result)
+			self.filteredProceduresBySearch(result);
 		});
-	}
+	};
+
 	self.saveProcedure = function (id) {
-		debugger;
 		var proc = _.filter(self.filteredProceduresBySearch(), function (e) {
 			return e.Id === id;
-		})
-		debugger;
+		});
 		var e = ko.mapping.toJS(proc);
-		debugger;
+
 		ajaxcall({
-			url: "/Setup/SaveProcedure",
+			url: options.saveStoredProcsUrl,
 			type: 'POST',
 			data: JSON.stringify({
-				model: e,
 				account: self.keys.AccountApiKey,
-				dataConnect: self.keys.DatabaseApiKey
+				dataConnect: self.keys.DatabaseApiKey,
+				model: e
 			})
 		}).done(function (result) {
 			toastr.success("Saved Procedure " + e.DisplayName);
 		});
-	}
+	};
 
 	self.LoadJoins = function () {
 		// Load and setup Relations
@@ -261,14 +260,14 @@
 				JoinType: x.JoinType,
 				FieldName: x.FieldName,
 				JoinFieldName: x.JoinFieldName
-			}
+			};
 		});
 
 		return joinsToSave;
-	}
+	};
 
 	self.SaveJoins = function () {
-		
+
 		var joinsToSave = self.getJoinsToSave();
 
 		ajaxcall({
@@ -286,7 +285,7 @@
 
 
 	self.saveChanges = function () {
-		
+
 		var tablesToSave = $.map(self.Tables.model(), function (x) {
 			if (x.Selected()) {
 				return x;
@@ -304,23 +303,23 @@
 					e.saveTable(self.keys.AccountApiKey, self.keys.DatabaseApiKey);
 				});
 			}
-		})
-	}
+		});
+	};
 
-	self.download = function(content, fileName, contentType) {
+	self.download = function (content, fileName, contentType) {
 		var a = document.createElement("a");
 		var file = new Blob([content], { type: contentType });
 		a.href = URL.createObjectURL(file);
 		a.download = fileName;
 		a.click();
-	}
+	};
 
 	self.exportAll = function () {
 		var tablesToSave = $.map(self.Tables.model(), function (x) {
 			if (x.Selected()) {
 				return ko.mapping.toJS(x, {
 					'ignore': ["saveTable", "JoinTable"]
-				})
+				});
 			}
 		});
 
@@ -333,12 +332,13 @@
 
 		var connection = _.filter(self.DataConnections(), function (i, e) { return e.DataConnectGuid == self.currentConnectionKey(); });
 		self.download(exportJson, (connection.length > 0 ? connection[0].DataConnectName : 'dotnet-dataconnection-export') + '.json', 'text/plain');
-	}
+	};
 
 	self.importingFile = ko.observable(false);
 	self.importCancel = function () {
 		self.importingFile(false);
-	}
+	};
+
 	self.importFile = function (file) {
 		var reader = new FileReader();
 		reader.onload = function (event) {
@@ -350,7 +350,7 @@
 				if (tableMatch.length > 0) {
 					var match = tableMatch[0];
 				} else {
-
+					//
 				}
 			});
 
@@ -361,12 +361,12 @@
 
 		self.importingFile(false);
 
-	}
+	};
 
 	self.importStart = function () {
 		self.importingFile(true);
-	}
-}
+	};
+};
 
 var tablesViewModel = function (options) {
 	var self = this;
@@ -411,7 +411,6 @@ var tablesViewModel = function (options) {
 					}
 				});
 
-				
 				return;
 			}
 
@@ -431,7 +430,7 @@ var tablesViewModel = function (options) {
 			}).done(function () {
 				toastr.success("Saved table " + e.DisplayName);
 			});
-		}
+		};
 
 	});
 
@@ -439,7 +438,7 @@ var tablesViewModel = function (options) {
 		return _.filter(self.model(), function (e) {
 			return e.Id() > 0 && e.Selected();
 		});
-	})
+	});
 
 	self.tableFilter = ko.observable();
 
@@ -451,12 +450,12 @@ var tablesViewModel = function (options) {
 
 		return _.filter(self.model(), function (e) {
 			return e.TableName().toLowerCase().indexOf(filterText.toLowerCase()) >= 0;
-		})
-	})
+		});
+	});
 
 	self.clearTableFilter = function () {
 		self.tableFilter('');
-	}
+	};
 
 	self.selectAll = function () {
 		$.each(self.model(), function (i, e) {
@@ -467,7 +466,7 @@ var tablesViewModel = function (options) {
 				});
 			}
 		});
-	}
+	};
 
 	self.unselectAll = function () {
 		$.each(self.model(), function (i, e) {
@@ -476,27 +475,27 @@ var tablesViewModel = function (options) {
 				c.Selected(false);
 			});
 		});
-	}
+	};
 
 	self.selectAllColumns = function (e) {
 		$.each(e.Columns(), function (j, c) {
 			c.Selected(true);
 		});
-	}
+	};
 
 	self.unselectAllColumns = function (e) {
 		$.each(e.Columns(), function (j, c) {
 			c.Selected(false);
 		});
-	}
+	};
 
 	self.columnSorted = function (args) {
 		$.each(args.targetParent(), function (i, e) {
 			e.DisplayOrder(i);
 		});
 
-	}
-}
+	};
+};
 
 var proceduresViewModel = function (options) {
 	var self = this;
@@ -510,13 +509,12 @@ var proceduresViewModel = function (options) {
 			bootbox.confirm("Are you sure you would like to delete Procedure '" + e.TableName + "'?", function (r) {
 				if (r) {
 					ajaxcall({
-						url: "/Setup/DeleteProcedure",
+						url: options.deleteStoredProcUrl,
 						type: 'POST',
 						data: JSON.stringify({
-							Id: e.Id,
 							accountKey: apiKey,
-							dataConnectKey: dbKey
-							
+							dataConnectKey: dbKey,
+							Id: e.Id
 						})
 					}).done(function () {
 						toastr.success("Deleted procedure " + e.TableName);
@@ -525,12 +523,11 @@ var proceduresViewModel = function (options) {
 			});
 
 			return;
-		}
-			
+		};
 
 	});
 
 	self.filteredProcedures = ko.computed(function () {
 		return self.proceduremodel();
-	})
-}
+	});
+};
