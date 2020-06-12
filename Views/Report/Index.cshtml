@@ -253,14 +253,17 @@
                         <select class="form-control" data-bind="options: Tables, optionsCaption: 'Choose Section...', optionsText: 'tableName', value: SelectedTable, disable: isFormulaField"></select>
                     </div>
                     <div class="col-md-12" data-bind="if: ReportType()=='Custom'">
-
-                        <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'TableName', optionsValue: 'Id', value: SelectedProcedure ,event:{ change: procedureChanged}"></select>
+                        <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'TableName', optionsValue: 'Id', value: SelectedProcedure, event:{ change: procedureChanged}"></select>
                     </div>
-                    <div class="row" data-bind="with: ProcedureParamters">
+                    <div class="col-md-12 row" data-bind="with: ProcedureParamters">
+                        <hr />
+                        <p>
+                            Please provide values 
+                        </p>
                         <div data-bind="foreach: Parameters">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label> <span data-bind="text: ParameterName"> </span></label>
-                                <input type="text" class="form-control" data-bind="value: $data.ParameterValue, attr: {id: $index()}" />
+                                <input type="text" class="form-control" required data-bind="value: $data.ParameterValue, attr: {id: $index()}" />
                             </div>
                         </div>
                     </div>

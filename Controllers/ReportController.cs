@@ -120,7 +120,8 @@ namespace ReportBuilder.Web.Controllers
             var procedures = await new ReportBuilder.Web.Controllers.SetupController().GetProcedures();
             return Json(procedures, JsonRequestBehavior.AllowGet);
         }
-            public async Task<JsonResult> CallReportApi(string method, string model)
+
+        public async Task<JsonResult> CallReportApi(string method, string model)
         {
             using (var client = new HttpClient())
             {

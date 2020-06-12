@@ -1667,12 +1667,25 @@ var reportViewModel = function (options) {
 		});
 	};
 	self.loadProcedures = function () {
-		// Load tables
+		// Load procs
 		ajaxcall({
-			url: "/Report/CallProcedure",
-			type: "GET"
+			url: options.apiUrl,
+			data: {
+				method: "/ReportApi/GetProcedures",
+				model: JSON.stringify({
+					adminMode: self.adminMode()
+				})
+			}
 		}).done(function (result) {
-			self.Procedures(result);
+			self.Procedures(_.map(result || [], function (x) {
+				return {
+					Id: x.tableId,
+					TableName: x.tableDbName,
+					DisplayName: x.tableName,
+					Columns: x.columns,
+					Parameters: x.parameters
+				};
+			}));
 		});
 	};
 	self.init = function (folderId, noAccount) {
