@@ -577,9 +577,9 @@ var reportViewModel = function (options) {
 			self.ChooseFields(flds);
 		});
 	});
-	self.SelectedProcedure.subscribe(function (proc) {
+	//self.SelectedProcedure.subscribe(function (proc) {
 		
-	});
+	//});
 	self.MoveChosenFields = function () { // Move chosen fields to selected fields
 		_.forEach(self.ChosenFields(), function (e) {
 			if (_.filter(self.SelectedFields(), function (x) { return x.fieldId == e.fieldId; }).length > 0) {
@@ -923,7 +923,9 @@ var reportViewModel = function (options) {
 		return groups;
 	};
 	self.BuildReportData = function (drilldown, IsComparision, index) {
-		if (self.ReportType() === 'Custom') {
+
+		// First part is aaving report data using custom report with proc
+		if (self.ReportType() === 'Custom') { 
 			return {
 				ReportID: self.ReportID(),
 				ReportName: self.ReportName(),
@@ -935,7 +937,6 @@ var reportViewModel = function (options) {
 						ParameterName: e.ParameterName,
 						ParameterValue: e.ParameterValue,
 					};
-
 				}),
 				ReportType: self.ReportType(),
 				UserId: self.manageAccess.getAsList(self.manageAccess.users),
