@@ -922,7 +922,7 @@ var reportViewModel = function (options) {
 	};
 	self.BuildReportData = function (drilldown, isComparison, index) {
 
-		// First part is aaving report data using custom report with proc
+		// First part is saving report data using custom report with proc
 		if (self.ReportType() === 'Custom') {
 			return {
 				ReportID: self.ReportID(),
