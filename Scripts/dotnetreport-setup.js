@@ -21,7 +21,10 @@
 		if (self.canSwitchConnection()) {
 			bootbox.confirm("Are you sure you would like to switch your Database Connection?", function (r) {
 				if (r) {
-					window.location.href = window.location.pathname + "?" + $.param({ 'databaseApiKey': self.currentConnectionKey() })
+					if ($.blockUI && !noBlocking) {
+						$.blockUI({ baseZ: 500 });
+					}
+					window.location.href = window.location.pathname + "?" + $.param({ 'databaseApiKey': self.currentConnectionKey() });
 				}
 			});
 		}
@@ -214,7 +217,11 @@
 				model: e
 			})
 		}).done(function (result) {
-			toastr.success("Saved Procedure " + e.DisplayName);
+			toastr.success("Saved Procedure " + e.TableName);
+			if ($.blockUI) {
+				$.blockUI({ baseZ: 500 });
+			}
+			window.location.reload();
 		});
 	};
 
@@ -503,7 +510,7 @@ var proceduresViewModel = function (options) {
 
 	$.each(self.proceduremodel(), function (i, t) {
 
-		t.deleteTable = function (apiKey, dbKey) {
+		t.deleteProc = function (apiKey, dbKey) {
 			var e = ko.mapping.toJS(t);
 
 			bootbox.confirm("Are you sure you would like to delete Procedure '" + e.TableName + "'?", function (r) {
@@ -512,12 +519,13 @@ var proceduresViewModel = function (options) {
 						url: options.deleteStoredProcUrl,
 						type: 'POST',
 						data: JSON.stringify({
-							accountKey: apiKey,
-							dataConnectKey: dbKey,
-							Id: e.Id
+							account: apiKey,
+							dataConnect: dbKey,
+							procId: e.Id
 						})
 					}).done(function () {
 						toastr.success("Deleted procedure " + e.TableName);
+						self.proceduremodel.remove(t);
 					});
 				}
 			});
