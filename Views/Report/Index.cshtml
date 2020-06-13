@@ -7,6 +7,36 @@
 
 @section scripts{
     <script type="text/javascript">
+        ko.bindingHandlers.datepicker = {
+            init: function (element, valueAccessor, allBindingsAccessor) {
+                var $el = $(element);
+
+                //initialize datepicker with some optional options
+                var options = allBindingsAccessor().datepickerOptions || {};
+                $el.datepicker(options);
+
+                //handle the field changing
+                ko.utils.registerEventHandler(element, "change", function () {
+                    var observable = valueAccessor();
+                    observable($el.datepicker("getDate"));
+                });
+
+                //handle disposal (if KO removes by the template binding)
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                    $el.datepicker("destroy");
+                });
+
+            },
+            update: function (element, valueAccessor) {
+                var value = ko.utils.unwrapObservable(valueAccessor()),
+                    $el = $(element),
+                    current = $el.datepicker("getDate");
+
+                if (value - current !== 0) {
+                    $el.datepicker("setDate", value);
+                }
+            }
+        };
 
 @*
     The Javascript code below is related to presentation for the Report Builder. You don't have to change it, unless you intentionally want to
@@ -31,6 +61,7 @@
             });
 
             vm.init(@(Request.QueryString["folderId"]!=null? Request.QueryString["folderId"]: "0"), data.noAccount);
+           
             ko.applyBindings(vm);
         });
     });
@@ -255,115 +286,131 @@
 
                         <select class="form-control" data-bind="options: Procedures, optionsCaption: 'Choose Section...', optionsText: 'TableName', optionsValue: 'Id', value: SelectedProcedure,event:{ change: procedureChanged}"></select>
                     </div>
-                    <div class="row" data-bind="with: ProcedureParamters">
-                        <div data-bind="foreach: Parameters">
-                            <div class="col-md-3">
-                                <label> <span data-bind="text: ParameterName"> </span></label>
-                                <input type="text" class="form-control" data-bind="value: $data.ParameterValue, attr: {id: $index()}" />
+                    <div data-bind="with: ProcedureParamters">
+                    <div class="row" >
+                        <div class="col-md-12">
+                            <h5><span class="fa fa-info-circle"></span>Enter value for store procedure parametes:</h5>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-12 padded-div" data-bind="visible: ChooseFields().length>0">
-                        <div class="small pull-left">
-                            Check the fields you would like to use in the Report
-                        </div>
-                        <div class="pull-right">
-                            <a href="#" class="btn btn-primary btn-xs" title="Save Custom Formula Field" data-bind="click: saveFormulaField, visible: isFormulaField">Save</a>
-                            <a href="#" class="btn btn-xs" title="Custom Field using Formula" data-bind="click: function(){isFormulaField(!isFormulaField())}, text: isFormulaField()? 'Cancel': 'Customize', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
-
-                            <a href="#" class="btn btn-default btn-xs" data-bind="click: MoveAllFields, visible: !isFormulaField()">Select all</a>
-                            <a href="#" class="btn btn-default btn-xs" data-bind="click: RemoveSelectedFields, visible: !isFormulaField()">Remove all</a>
-                        </div>
-                    </div>
-                    <div class="col-md-12 padded-div" data-bind="visible: ChooseFields().length>0 && isFormulaField()">
-                        <div class="alert alert-info">
-                            You are now creating a Customized Field. Check Fields you want to use in the calculation below, then choose the operations you want to perform, and click "Save" on the right above to add your Custom field.
-                            Please note that Custom Field must be chosen in within the same Section and their data types must match.
-                        </div>
-                    </div>
-                    <div class="row container-fluid">
-                        <!-- ko foreach: ChooseFields -->
-                        <div class="col-md-3 col-sm-4 col-xs-6">
-                            <div class="list-group-item">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" data-bind="checkedInArray: {array: $parent.isFormulaField() ? $parent.formulaFields : $parent.SelectedFields, value: $data}"> <span data-bind="text: fieldName"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /ko -->
-                    </div>
-                    <div data-bind="if: isFormulaField">
-                        <br />
-                        <div class="col-xs-12 padded-div">
-                            <div class="small pull-left">
-                                Setup your Formula for calculating this Field
-                            </div>
-                            <div class="pull-right">
-                                <a href="#" class="btn btn-default btn-xs" data-bind="click: addFormulaParentheses">Add ( )</a>
-                                <a href="#" class="btn btn-default btn-xs" title="Add a Constant Value" data-bind="click: addFormulaConstantValue">Add Value</a>
-                                <a href="#" class="btn btn-default btn-xs" data-bind="click: clearFormulaField">Clear</a>
-                            </div>
-                        </div>
-                        <div class="form-horizontal">
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Field Label</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control input-sm" data-bind="value: formulaFieldLabel" required placeholder="Custom Field Label" />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Data Format</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control input-sm" data-bind="value: formulaDataFormat" required>
-                                        <!-- ko ifnot: formulaOnlyHasDateFields -->
-                                        <option>String</option>
-                                        <option>Integer</option>
-                                        <option>Double</option>
+                            <div class="row">
+                                <div data-bind="foreach: Parameters">
+                                    <div class="col-md-3" style="margin-left:1%">
+                                        <label> <span data-bind="text: ParameterName"> </span></label>
+                                        <!-- ko if: ParameterDataTypeString === 'DateTime' -->
+                                        <input type="text" class="form-control" data-bind="datePicker: datep  , attr: {id: $index()}" />
                                         <!-- /ko -->
-                                        <!-- ko if: formulaOnlyHasDateFields -->
-                                        <option>Days</option>
-                                        <option>Hours</option>
-                                        <option>Minutes</option>
-                                        <option>Seconds</option>
+                                        <!-- ko if: ParameterDataTypeString === 'String' -->
+                                        <input type="text" class="form-control" data-bind="value: $data.ParameterValue, attr: {id: $index()}" />
                                         <!-- /ko -->
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Field Formula</label>
-                                <div class="col-sm-10">
-                                    <!-- ko foreach: formulaFields -->
-                                    <h3 class="pull-left" data-bind="visible: setupFormula.isParenthesesStart" style="margin-top: 0;">(</h3>
-                                    <!-- ko if: !setupFormula.isParenthesesStart() && !setupFormula.isParenthesesEnd() -->
-                                    <div class="list-group-item pull-left" style="margin-left: 15px; padding: 5px 15px">
-                                        <span data-bind="text: fieldName, visible: !setupFormula.isConstantValue()"></span>
-                                        <!-- ko if: setupFormula.isConstantValue -->
-                                        <input data-bind="value: setupFormula.constantValue" class="form-control input-sm" required />
+                                        <!-- ko if: ParameterDataTypeString === 'Boolean' -->
+                                        <br />
+                                        <input type="checkbox" data-bind="value: $data.ParameterValue, attr: {id: $index()}" />
                                         <!-- /ko -->
                                     </div>
-                                    <!-- /ko -->
-                                    <h3 class="pull-left" data-bind="visible: setupFormula.isParenthesesEnd" style="margin-top: 0;">)</h3>
-                                    <div class="pull-left" style="margin-left: 15px;" data-bind="visible: $parent.showFormulaOperation($index())">
-                                        <select class="form-control input-sm" style="max-width: 50px;" data-bind="value: setupFormula.formulaOperation">
-                                            <option>-</option>
-                                            <!-- ko if: ['Int','Money','Float'].indexOf(fieldType) != -1 -->
-                                            <option>+</option>
-                                            <option>*</option>
-                                            <option>/</option>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 padded-div" data-bind="visible: ChooseFields().length>0">
+                            <div class="small pull-left">
+                                Check the fields you would like to use in the Report
+                            </div>
+                            <div class="pull-right">
+                                <a href="#" class="btn btn-primary btn-xs" title="Save Custom Formula Field" data-bind="click: saveFormulaField, visible: isFormulaField">Save</a>
+                                <a href="#" class="btn btn-xs" title="Custom Field using Formula" data-bind="click: function(){isFormulaField(!isFormulaField())}, text: isFormulaField()? 'Cancel': 'Customize', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
+
+                                <a href="#" class="btn btn-default btn-xs" data-bind="click: MoveAllFields, visible: !isFormulaField()">Select all</a>
+                                <a href="#" class="btn btn-default btn-xs" data-bind="click: RemoveSelectedFields, visible: !isFormulaField()">Remove all</a>
+                            </div>
+                        </div>
+                        <div class="col-md-12 padded-div" data-bind="visible: ChooseFields().length>0 && isFormulaField()">
+                            <div class="alert alert-info">
+                                You are now creating a Customized Field. Check Fields you want to use in the calculation below, then choose the operations you want to perform, and click "Save" on the right above to add your Custom field.
+                                Please note that Custom Field must be chosen in within the same Section and their data types must match.
+                            </div>
+                        </div>
+                        <div class="row container-fluid">
+                            <!-- ko foreach: ChooseFields -->
+                            <div class="col-md-3 col-sm-4 col-xs-6">
+                                <div class="list-group-item">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" data-bind="checkedInArray: {array: $parent.isFormulaField() ? $parent.formulaFields : $parent.SelectedFields, value: $data}"> <span data-bind="text: fieldName"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        <div data-bind="if: isFormulaField">
+                            <br />
+                            <div class="col-xs-12 padded-div">
+                                <div class="small pull-left">
+                                    Setup your Formula for calculating this Field
+                                </div>
+                                <div class="pull-right">
+                                    <a href="#" class="btn btn-default btn-xs" data-bind="click: addFormulaParentheses">Add ( )</a>
+                                    <a href="#" class="btn btn-default btn-xs" title="Add a Constant Value" data-bind="click: addFormulaConstantValue">Add Value</a>
+                                    <a href="#" class="btn btn-default btn-xs" data-bind="click: clearFormulaField">Clear</a>
+                                </div>
+                            </div>
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Field Label</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control input-sm" data-bind="value: formulaFieldLabel" required placeholder="Custom Field Label" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Data Format</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control input-sm" data-bind="value: formulaDataFormat" required>
+                                            <!-- ko ifnot: formulaOnlyHasDateFields -->
+                                            <option>String</option>
+                                            <option>Integer</option>
+                                            <option>Double</option>
+                                            <!-- /ko -->
+                                            <!-- ko if: formulaOnlyHasDateFields -->
+                                            <option>Days</option>
+                                            <option>Hours</option>
+                                            <option>Minutes</option>
+                                            <option>Seconds</option>
                                             <!-- /ko -->
                                         </select>
                                     </div>
-                                    <!-- /ko -->
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Field Formula</label>
+                                    <div class="col-sm-10">
+                                        <!-- ko foreach: formulaFields -->
+                                        <h3 class="pull-left" data-bind="visible: setupFormula.isParenthesesStart" style="margin-top: 0;">(</h3>
+                                        <!-- ko if: !setupFormula.isParenthesesStart() && !setupFormula.isParenthesesEnd() -->
+                                        <div class="list-group-item pull-left" style="margin-left: 15px; padding: 5px 15px">
+                                            <span data-bind="text: fieldName, visible: !setupFormula.isConstantValue()"></span>
+                                            <!-- ko if: setupFormula.isConstantValue -->
+                                            <input data-bind="value: setupFormula.constantValue" class="form-control input-sm" required />
+                                            <!-- /ko -->
+                                        </div>
+                                        <!-- /ko -->
+                                        <h3 class="pull-left" data-bind="visible: setupFormula.isParenthesesEnd" style="margin-top: 0;">)</h3>
+                                        <div class="pull-left" style="margin-left: 15px;" data-bind="visible: $parent.showFormulaOperation($index())">
+                                            <select class="form-control input-sm" style="max-width: 50px;" data-bind="value: setupFormula.formulaOperation">
+                                                <option>-</option>
+                                                <!-- ko if: ['Int','Money','Float'].indexOf(fieldType) != -1 -->
+                                                <option>+</option>
+                                                <option>*</option>
+                                                <option>/</option>
+                                                <!-- /ko -->
+                                            </select>
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="clearfix"></div>
+
                         </div>
-
-                        <div class="clearfix"></div>
-
                     </div>
-                </div>
                 <!-- ko if: SelectedFields().length>0 -->
                 <hr />
                 <h5><span class="fa fa-table"></span> Selected data for the Report</h5>

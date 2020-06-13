@@ -1,6 +1,7 @@
 ﻿/// .Net Report Builder view model v3.0.3
 /// License has to be purchased for use
 /// 2015-2018 (c) www.dotnetreport.com
+
 function pagerViewModel(args) {
 	args = args || {};
 	var self = this;
@@ -278,7 +279,7 @@ var reportViewModel = function (options) {
 	options.userId = options.userSettings.currentUserId || "";
 	options.users = options.userSettings.users;
 	options.userRoles = options.userSettings.userRoles;
-
+	self.datep = ko.observable(new Date());
 	self.currentUserId = options.userSettings.userId;
 	self.currentUserRole = (options.userSettings.currentUserRoles || []).join();
 	self.currentUserName = options.userSettings.currentUserName;
@@ -1674,6 +1675,11 @@ var reportViewModel = function (options) {
 			type: "GET"
 		}).done(function (result) {
 			debugger
+			_.forEach(result[0].Parameters, function (data, i) {
+				debugger;
+				if (data.ParameterDataTypeString === "DateTime")
+					data.ParameterValue = new Date(data.ParameterValue);
+			});
 			self.Procedures(result);
 		});
 	};

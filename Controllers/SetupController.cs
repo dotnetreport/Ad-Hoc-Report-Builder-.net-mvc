@@ -317,9 +317,9 @@ namespace ReportBuilder.Web.Controllers
                     TableViewModel table = new TableViewModel();
                     table.Id = Convert.ToInt32(dr["ID"].ToString());
                     table.TableName = dr["StoreProcedureName"].ToString();
-
+                    table.DisplayName = dr["StoreProcedure_DisplayName"].ToString();
                     // Get Store Procedure Paramater
-                     Query = @"Select * from StoreProcedureColumnDetail where StoreProcedureID = ?";
+                    Query = @"Select * from StoreProcedureColumnDetail where StoreProcedureID = ?";
                      cmd = new OleDbCommand(Query, conn);
                     cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@ProcedureID", table.Id);
@@ -348,7 +348,8 @@ namespace ReportBuilder.Web.Controllers
                         var parameter = new ParameterViewModel
                         {
                             ParameterName = drdetail["ParameterName"].ToString(),
-                            ParameterDataTypeString = GetType(ConvertToJetDataType(Convert.ToInt32(drdetail["ParameterDataType"].ToString()))).Name
+                            ParameterDataTypeString = GetType(ConvertToJetDataType(Convert.ToInt32(drdetail["ParameterDataType"].ToString()))).Name,
+                            ParameterValue = GetType(ConvertToJetDataType(Convert.ToInt32(drdetail["ParameterDataType"].ToString()))).Name == "DateTime" ? DateTime.Now.ToShortDateString() : null
                         };
                         parameterViewModels.Add(parameter);
                     }
@@ -362,7 +363,7 @@ namespace ReportBuilder.Web.Controllers
             }
 
 
-            return tables;
+       return tables;
         }
 
 
@@ -448,7 +449,7 @@ namespace ReportBuilder.Web.Controllers
                 cmd.CommandType = CommandType.Text;
                 DataTable dtProcedures = new DataTable();
                 dtProcedures.Load(cmd.ExecuteReader());
-                int count = 1;
+                //int count = 1;
                 foreach (DataRow dr in dtProcedures.Rows)
                 {
                     string ProcName = dr["ROUTINE_NAME"].ToString();
@@ -457,11 +458,16 @@ namespace ReportBuilder.Web.Controllers
                     // Get the parameters.
                     OleDbCommandBuilder.DeriveParameters(cmd);
                     List<ParameterViewModel> parameterViewModels = new List<ParameterViewModel>();
+                    var AllParamters = cmd.Parameters;
+                    OleDbParameter[] allParamter =new OleDbParameter[cmd.Parameters.Count];
+                    int count = 0;
                     foreach (OleDbParameter param in cmd.Parameters)
                     {
 
                         if (param.Direction == ParameterDirection.Input)
                         {
+                            param.Value = DBNull.Value;
+                            allParamter[count] = param;
                             var parameter = new ParameterViewModel
                             {
                                 ParameterName = param.ParameterName,
@@ -469,21 +475,20 @@ namespace ReportBuilder.Web.Controllers
                                 ParamterDataTypeOleDbType = param.OleDbType,
 
                                 ParameterDataTypeString = GetType(ConvertToJetDataType(Convert.ToInt32(param.OleDbType))).Name
+
                             };
                             parameterViewModels.Add(parameter);
+                            count++;
                         }
                     }
+                    cmd.Parameters.Clear();
                     DataTable dt = new DataTable();
                     cmd = new OleDbCommand(ProcName, conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    foreach (var data in parameterViewModels)
-                    {
-                        cmd.Parameters.Add(new OleDbParameter { Value = DBNull.Value, ParameterName = data.ParameterName, Direction = ParameterDirection.Input, IsNullable = true });
-                    }
-                    OleDbDataReader reader = cmd.ExecuteReader();
-                    dt = reader.GetSchemaTable();
-                    // dt.Load(cmd.ExecuteReader());
-
+                   
+                    cmd.Parameters.AddRange(allParamter.Where(x=>x != null).ToArray());
+                        OleDbDataReader reader = cmd.ExecuteReader();
+                        dt = reader.GetSchemaTable();
                     // Store the table names in the class scoped array list of table names
                     List<ColumnViewModel> columnViewModels = new List<ColumnViewModel>();
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -499,6 +504,7 @@ namespace ReportBuilder.Web.Controllers
                     {
                         Id = count,
                         TableName = ProcName,
+                        DisplayName = ProcName,
                         Parameters = parameterViewModels,
                         Columns = columnViewModels
                     });
@@ -524,11 +530,12 @@ namespace ReportBuilder.Web.Controllers
                     conn.Open();
                     foreach (var data in model)
                     {
-                        string Query = @"INSERT into StoreProcedures ([StoreProcedureName]) values (?); SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                        string Query = @"INSERT into StoreProcedures ([StoreProcedureName],[StoreProcedure_DisplayName]) values (?,?); SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                         OleDbCommand cmd = new OleDbCommand(Query, conn);
                         cmd.CommandType = CommandType.Text;
                         cmd.Parameters.AddWithValue("@StoreProcedureName", data.TableName);
+                        cmd.Parameters.AddWithValue("@StoreProcedure_DisplayName", data.DisplayName);
                         var Id = Convert.ToInt32(cmd.ExecuteScalar());
 
                         foreach (var column in data.Columns)

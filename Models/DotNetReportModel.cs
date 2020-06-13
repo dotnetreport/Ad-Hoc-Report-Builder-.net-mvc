@@ -107,7 +107,7 @@ namespace ReportBuilder.Web.Models
         public string ParameterName { get; set; }
 
         public string ParameterValue { get; set; }
-
+        public object ParameterValue_object { get; set; }
         public string ParameterDataTypeString { get; set; }
         public Type ParameterDataTypeCLR { get; set; }
         public OleDbType ParamterDataTypeOleDbType { get; set; }

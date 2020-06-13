@@ -326,7 +326,13 @@
                     </div>
                     <div data-bind="attr: {id: 'table'+$index()}" class="panel-collapse collapse in">
 
+                        <div class="panel-body">
+                            <p>
+                                <label class="label-xs">Procedure Display Name</label><br />
+                                <input type="text" class="form-control" data-bind="value:DisplayName" readonly/>
+                            </p>
 
+                        </div>
                         <label style="padding-left: 15px;" class="label-sm"><span data-bind="text: Columns().length"></span> Columns</label>
 
                         <div class="list-group">
@@ -558,7 +564,12 @@
 
                         </div>
                         <div data-bind="attr: {id: 'table'+$index()}" class="panel-collapse collapse in">
-
+                            <div class="panel-body">
+                                <p><label class="label-xs">Procedure Display Name</label><br />
+                                <input type="text" class="form-control" data-bind="value:DisplayName" />
+                                </p>
+                               
+                            </div>
 
                             <label style="padding-left: 15px;" class="label-sm"><span data-bind="text: Columns.length"></span> Columns</label>
 
