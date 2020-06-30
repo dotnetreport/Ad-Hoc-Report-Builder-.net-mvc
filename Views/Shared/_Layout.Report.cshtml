@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html ng-app="dotnetreport">
 <head>
     <meta charset="utf-8" />
     <link rel="shortcut icon" href="/favicon.ico">
@@ -16,6 +16,7 @@
     <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
     <link href="~/Content/css/select2.min.css" rel="stylesheet" />
     <link href="~/Content/dotnetreport.css?v=3.0.0" rel="stylesheet" />
+    <script src="~/Scripts/angularjs/src/angularjs-1.8.0.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     @RenderSection("head", required: false)
     <style type="text/css">
@@ -24,6 +25,11 @@
             padding-bottom: 40px;
         }
     </style>
+    <script>
+        var dotNetReportApp = dotNetReportApp || {};
+        dotNetReportApp.Urls = dotNetReportApp.Urls || {};
+        dotNetReportApp.Urls.baseUrl = '@Url.Content("~")';
+    </script>
 </head>
 
 <body>

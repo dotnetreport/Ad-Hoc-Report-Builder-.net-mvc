@@ -168,6 +168,13 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Scripts\angularjs\js\app-config.js" />
+    <Content Include="Scripts\angularjs\js\app.js" />
+    <Content Include="Scripts\angularjs\report-components\report-setup\report-setup-proc.js" />
+    <Content Include="Scripts\angularjs\report-components\report-setup\report-setup-relation.js" />
+    <Content Include="Scripts\angularjs\report-components\report-setup\report-setup-table.js" />
+    <Content Include="Scripts\angularjs\src\angular-route.min.js" />
+    <Content Include="Scripts\angularjs\src\angularjs-1.8.0.min.js" />
     <Content Include="Scripts\bootbox.js" />
     <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap-editable.min.js" />
@@ -289,6 +296,7 @@
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
+    <Content Include="Views\angularjs\components-view\report_setup_table.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -330,6 +338,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Scripts\angularjs\report-components\report-run\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
