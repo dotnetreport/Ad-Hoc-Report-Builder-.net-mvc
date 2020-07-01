@@ -1,10 +1,8 @@
-﻿angular.
-    module('dotnetreport').
-    config(['$routeProvider',
+﻿angular.module('dotnetreport').config(['$routeProvider',
         function config($routeProvider) {
             $routeProvider.
                 when('/setup', {
-                    template: '<table-setup></phone-list>'
+                    template: '<table-setup></table-setup>'
                 }).
                 otherwise('/setup');
         }

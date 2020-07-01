@@ -145,6 +145,10 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="tablesfields">
             <br />
+          <ng-view>
+
+          </ng-view>
+           <setup-table></setup-table>
             <div data-bind="with: Tables">
                 <input type="text" class="form-control input-sm" placeholder="Filter Tables for..." data-bind="value: tableFilter, valueUpdate: 'afterkeydown'" style="float: left; width: 140px;">
                 <button class="btn btn-sm" data-bind="click: clearTableFilter,  visible: tableFilter()!='' && tableFilter()!=null"><span class="glyphicon glyphicon-remove"></span></button>
